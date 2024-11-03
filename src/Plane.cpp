@@ -11,6 +11,12 @@
 #include <csignal>
 #include <ctime>
 #include <unistd.h> // For sleep()
+#include <sys/dispatch.h>
+
+typedef struct {
+	unsigned int id;
+	char body[200];
+} msg_struct;
 
 Plane::Plane(int arrivalTime, std::string ID, float X, float Y, float Z, float speedX, float speedY, float speedZ) {
 	this->arrivalTime = arrivalTime;
@@ -24,6 +30,28 @@ Plane::Plane(int arrivalTime, std::string ID, float X, float Y, float Z, float s
 	std::cout << toString() << std::endl;
 	outOfBounds = false;
 	setUpTimer();
+	name_attach_t *attach;
+	do {
+		attach = name_attach(NULL, ID.c_str(), 0);
+	} while (attach == NULL);
+	std::cout << "Server is running, waiting for messages..." << std::endl;
+	while (true) {
+		int rcvid;
+		msg_struct msg;
+		rcvid = MsgReceive(attach->chid, &msg, sizeof(msg), NULL);
+
+		if (rcvid == -1) {
+			perror("No msg received");
+			continue;
+		}
+
+		std::cout <<"Received message: " << msg.body << std::endl;
+
+		msg_struct reply = {msg.id, NULL};
+		std::strcpy(reply.body, toString().c_str());
+		MsgReply(rcvid, 0, &reply, sizeof(reply));
+	}
+	name_detach(attach,0);
 }
 
 Plane::~Plane() {
@@ -59,11 +87,6 @@ int Plane::setUpTimer() {
 		return EXIT_FAILURE;
 	}
 
-	// Keep the program running until the timer completes
-	// Wait indefinitely until the program exits from countdown_handler
-	while (!outOfBounds) {
-		sleep(1); // Sleep to let the timer work
-	}
 	return EXIT_SUCCESS;
 }
 
@@ -74,7 +97,7 @@ void Plane::positionUpdater(union sigval sv) {
 	// TODO Implement arrival time, this doesn't work.
 	if (time.tv_sec < item->getArrivalTime()) return;
 	item->modifyPositionWithSpeed();
-	std::cout << item->getCoordinatesString() << std::endl;
+	//std::cout << item->getCoordinatesString() << std::endl;
 	item->tester();
 }
 void Plane::tester() {

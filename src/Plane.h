@@ -1,9 +1,3 @@
-/*
- * Plane.h
- *
- *  Created on: Nov. 1, 2024
- *      Author: maika
- */
 
 #ifndef PLANE_H_
 #define PLANE_H_
@@ -26,7 +20,7 @@ private:
 	float speedX;
 	float speedY;
 	float speedZ;
-	bool outOfBounds;
+	volatile bool outOfBounds;
 	static void positionUpdater(union sigval sv);
 	int setUpTimer();
 };

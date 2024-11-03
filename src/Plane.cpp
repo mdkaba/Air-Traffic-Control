@@ -1,9 +1,3 @@
-/*
- * Plane.cpp
- *
- *  Created on: Nov. 1, 2024
- *      Author: maika
- */
 
 #include "Plane.h"
 #include <time.h>
@@ -18,6 +12,7 @@ typedef struct {
 	char body[200];
 } msg_struct;
 
+// Creates the plane and hosts the plane server until exiting the area.
 Plane::Plane(int arrivalTime, std::string ID, float X, float Y, float Z, float speedX, float speedY, float speedZ) {
 	this->arrivalTime = arrivalTime;
 	this->ID = ID;
@@ -27,14 +22,14 @@ Plane::Plane(int arrivalTime, std::string ID, float X, float Y, float Z, float s
 	this->speedX = speedX;
 	this->speedY = speedY;
 	this->speedZ = speedZ;
-	std::cout << toString() << std::endl;
+	//std::cout << toString() << std::endl;
 	outOfBounds = false;
 	setUpTimer();
 	name_attach_t *attach;
 	do {
 		attach = name_attach(NULL, ID.c_str(), 0);
 	} while (attach == NULL);
-	std::cout << "Server is running, waiting for messages..." << std::endl;
+	//std::cout << "Server is running, waiting for messages..." << std::endl;
 	while (true) {
 		int rcvid;
 		msg_struct msg;
@@ -45,11 +40,18 @@ Plane::Plane(int arrivalTime, std::string ID, float X, float Y, float Z, float s
 			continue;
 		}
 
-		std::cout <<"Received message: " << msg.body << std::endl;
-
-		msg_struct reply = {msg.id, NULL};
-		std::strcpy(reply.body, toString().c_str());
-		MsgReply(rcvid, 0, &reply, sizeof(reply));
+		//std::cout <<"Received message: " << msg.body << std::endl;
+		// TODO Add a message for when the plane is not yet into the area
+		// (Arrival time not met)
+		if (!outOfBounds) {
+			msg_struct reply = {msg.id, NULL};
+			std::strcpy(reply.body, toString().c_str());
+			MsgReply(rcvid, 0, &reply, sizeof(reply));
+		} else {
+			msg_struct reply = {msg.id, "LEFT_AREA"};
+			MsgReply(rcvid, 0, &reply, sizeof(reply));
+			break;
+		}
 	}
 	name_detach(attach,0);
 }
@@ -100,8 +102,9 @@ void Plane::positionUpdater(union sigval sv) {
 	//std::cout << item->getCoordinatesString() << std::endl;
 	item->tester();
 }
+// TODO update when a plane gets out of bounds
 void Plane::tester() {
-	//if (X < 0 || X > 100000 || Y < 15000 || X > 40000 || Z < 0 || Z > 100000 ) {outOfBounds = true; delete this;}
+	if (X < -10 || X > 100010 || Y < 14990 || Y > 40010 || Z < -10 || Z > 100010 ) {outOfBounds = true;}
 }
 void Plane::modifyPositionWithSpeed() {
 	X += speedX;

@@ -1,3 +1,4 @@
+// Group 16 (Mamadou Diao Kaba (27070179), Maika Trepanier (40258910), Lifu Zhang (40081513))
 #ifndef AIRCRAFT_H
 #define AIRCRAFT_H
 

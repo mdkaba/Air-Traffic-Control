@@ -1,3 +1,4 @@
+// Group 16 (Mamadou Diao Kaba (27070179), Maika Trepanier (40258910), Lifu Zhang (40081513))
 #include "cTimer.h"
 
 cTimer::cTimer(uint32_t sec, uint32_t msec) {

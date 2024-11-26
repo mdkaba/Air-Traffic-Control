@@ -1,4 +1,4 @@
-
+// Group 16 (Mamadou Diao Kaba (27070179), Maika Trepanier (40258910), Lifu Zhang (40081513))
 #include "Aircraft.h"
 #include "ComputerSystem.h"
 #include "DataDisplay.h"
@@ -17,9 +17,9 @@ int main() {
 
 	//read the file
 	ifstream aircraftFile;
-	aircraftFile.open ("lowTraffic.txt");
+//	aircraftFile.open ("lowTraffic.txt");
 //	aircraftFile.open ("mediumTraffic.txt");
-//	aircraftFile.open ("highTraffic.txt");
+	aircraftFile.open ("highTraffic.txt");
 //	aircraftFile.open ("overloadTraffic.txt");
 
 	if (aircraftFile.is_open()) {
